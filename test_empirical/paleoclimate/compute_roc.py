@@ -31,7 +31,7 @@ os.makedirs("data/roc", exist_ok=True)
 # –------------
 
 # Run for early or late predictions
-bool_pred_early = False
+bool_pred_early = True
 
 # Import EWS data
 df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")

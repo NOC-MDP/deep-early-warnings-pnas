@@ -77,7 +77,7 @@ for tsid in tsid_vals:
 
     # Export
     dl_preds_mean.to_csv(
-        f"data/ml_preds/ensemble_trend_probs_dakos_forced_{tsid}.csv",
+        f"data/ml_preds_test/ensemble_trend_probs_dakos_forced_{tsid}.csv",
     )
 
 
@@ -115,5 +115,5 @@ for tsid in tsid_vals:
 
         # Export
         dl_preds_mean.to_csv(
-            f"data/ml_preds/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
+            f"data/ml_preds_test/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
         )

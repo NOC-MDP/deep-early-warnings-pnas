@@ -31,7 +31,7 @@ import ewstools
 
 from tensorflow.keras.models import load_model
 
-os.makedirs("data/ml_preds/", exist_ok=True)
+os.makedirs("data/ml_preds_test/", exist_ok=True)
 
 # -------------
 # Load all len1500 DL classifiers
@@ -75,7 +75,7 @@ for tsid in tsid_vals[1:]:
 
     # Export
     dl_preds_mean.to_csv(
-        f"data/ml_preds/ensemble_trend_probs_thermo_forced_{tsid}.csv",
+        f"data/ml_preds_test/ensemble_trend_probs_thermo_forced_{tsid}.csv",
     )
 
 
@@ -114,5 +114,5 @@ for tsid in tsid_vals[1:]:
 
         # Export
         dl_preds_mean.to_csv(
-            f"data/ml_preds/ensemble_trend_probs_thermo_null_{tsid}_{null_number}.csv",
+            f"data/ml_preds_test/ensemble_trend_probs_thermo_null_{tsid}_{null_number}.csv",
         )
