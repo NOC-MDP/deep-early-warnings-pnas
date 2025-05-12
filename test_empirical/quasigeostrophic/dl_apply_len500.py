@@ -32,71 +32,32 @@ import ewstools
 
 from tensorflow.keras.models import load_model
 
-os.makedirs("data/ml_preds/", exist_ok=True)
+os.makedirs("data/ml_preds/500/", exist_ok=True)
 
 
 # -------------
 # Load all len500 DL classifiers -
 # --------------
-
-root_path = "../../dl_train/best_models_tf215/len500/"
-classifier_names = sorted(
-    [name[:-6] for name in os.listdir(root_path) if name[-6:] == ".keras"]
-)
-list_classifiers = []
-for classifier_name in classifier_names:
-    # Import classifier
-    classifier = load_model(root_path + classifier_name + ".keras")
-    list_classifiers.append(classifier)
-
-
-tsid_vals = [1, 2, 4, 5, 6, 7, 8]
-
-# -----------
-# Get ensemble predictions for forced residual time series
-# ------------
-df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
-for tsid in tsid_vals:
-    print(f"compute dl predictions for tsid={tsid}")
-    series = df_ews_forced[(df_ews_forced["tsid"] == tsid)].set_index("Time")[
-        "residuals"
-    ]
-    # apply classifer to last 500 points prior to transition
-    ts = ewstools.TimeSeries(series.iloc[-500:])
-    # space predictions apart by 10 data points (inc must be defined in terms of time)
-    dt = series.index[1] - series.index[0]
-    inc = dt * 10
-
-    for classifier, classifier_name in zip(list_classifiers, classifier_names):
-        ts.apply_classifier_inc(classifier, inc=inc, verbose=0, name=classifier_name)
-        print("Predictions complete for classifier {}".format(classifier_name))
-
-    # Get ensemble dl prediction
-    dl_preds_mean = ts.dl_preds.groupby("time")[[0, 1, 2, 3]].mean()
-    dl_preds_mean.columns = ["fold_prob", "hopf_prob", "branch_prob", "null_prob"]
-    dl_preds_mean.index.name = "Time"
-
-    # Export
-    dl_preds_mean.to_csv(
-        f"data/ml_preds/ensemble_trend_probs_dakos_forced_{tsid}.csv",
+def dl_apply_len500(tsid_vals):
+    root_path = "../../dl_train/best_models_tf215/len500/"
+    classifier_names = sorted(
+        [name[:-6] for name in os.listdir(root_path) if name[-6:] == ".keras"]
     )
+    list_classifiers = []
+    for classifier_name in classifier_names:
+        # Import classifier
+        classifier = load_model(root_path + classifier_name + ".keras")
+        list_classifiers.append(classifier)
 
-
-# -----------
-# Get ensemble predictions for null residual time series
-# ------------
-
-df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
-null_numbers = df_ews_null["Null number"].unique()
-
-for tsid in tsid_vals:
-    for null_number in null_numbers:
-        print(
-            f"compute dl predictions for null time seires of tsid={tsid}, null number={null_number}"
-        )
-        series = df_ews_null[
-            (df_ews_null["tsid"] == tsid) & (df_ews_null["Null number"] == null_number)
-        ].set_index("Time")["residuals"]
+    # -----------
+    # Get ensemble predictions for forced residual time series
+    # ------------
+    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
+    for tsid in tsid_vals:
+        print(f"compute dl predictions for tsid={tsid}")
+        series = df_ews_forced[(df_ews_forced["tsid"] == tsid)].set_index("Time")[
+            "residuals"
+        ]
         # apply classifer to last 500 points prior to transition
         ts = ewstools.TimeSeries(series.iloc[-500:])
         # space predictions apart by 10 data points (inc must be defined in terms of time)
@@ -104,9 +65,7 @@ for tsid in tsid_vals:
         inc = dt * 10
 
         for classifier, classifier_name in zip(list_classifiers, classifier_names):
-            ts.apply_classifier_inc(
-                classifier, inc=inc, verbose=0, name=classifier_name
-            )
+            ts.apply_classifier_inc(classifier, inc=inc, verbose=0, name=classifier_name)
             print("Predictions complete for classifier {}".format(classifier_name))
 
         # Get ensemble dl prediction
@@ -116,5 +75,43 @@ for tsid in tsid_vals:
 
         # Export
         dl_preds_mean.to_csv(
-            f"data/ml_preds/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
+            f"data/ml_preds/500/ensemble_trend_probs_dakos_forced_{tsid}.csv",
         )
+
+
+    # -----------
+    # Get ensemble predictions for null residual time series
+    # ------------
+
+    df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
+    null_numbers = df_ews_null["Null number"].unique()
+
+    for tsid in tsid_vals:
+        for null_number in null_numbers:
+            print(
+                f"compute dl predictions for null time seires of tsid={tsid}, null number={null_number}"
+            )
+            series = df_ews_null[
+                (df_ews_null["tsid"] == tsid) & (df_ews_null["Null number"] == null_number)
+            ].set_index("Time")["residuals"]
+            # apply classifer to last 500 points prior to transition
+            ts = ewstools.TimeSeries(series.iloc[-500:])
+            # space predictions apart by 10 data points (inc must be defined in terms of time)
+            dt = series.index[1] - series.index[0]
+            inc = dt * 10
+
+            for classifier, classifier_name in zip(list_classifiers, classifier_names):
+                ts.apply_classifier_inc(
+                    classifier, inc=inc, verbose=0, name=classifier_name
+                )
+                print("Predictions complete for classifier {}".format(classifier_name))
+
+            # Get ensemble dl prediction
+            dl_preds_mean = ts.dl_preds.groupby("time")[[0, 1, 2, 3]].mean()
+            dl_preds_mean.columns = ["fold_prob", "hopf_prob", "branch_prob", "null_prob"]
+            dl_preds_mean.index.name = "Time"
+
+            # Export
+            dl_preds_mean.to_csv(
+                f"data/ml_preds/500/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
+            )

@@ -9,7 +9,6 @@ Use time ranges and transition times as given in Table S1 Dakos 2008
 @author: Thomas M. Bury
 """
 
-
 import numpy as np
 import pandas as pd
 
@@ -22,18 +21,17 @@ import re
 # –------------------
 
 
-
-def create_tsid(transition,list_df):
+def create_tsid(transition, list_df):
     df = pd.read_csv(
         f"data/qg{transition['run_id']}.eng.csv",
         header=0,
-        names=["Age", "Proxy",],
+        names=["Age", "Proxy", ],
     )
     # convert to days
     df["Age"] = df["Age"] * 5
     df = (
-        df[(df["Age"] <= transition["end_age"]*5) & (df["Age"] >= transition["start_age"]*5)]
-        .sort_values("Age",ascending=False)
+        df[(df["Age"] <= transition["end_age"] * 5) & (df["Age"] >= transition["start_age"] * 5)]
+        .sort_values("Age", ascending=False)
         .reset_index(drop=True)
     )
     df["Record"] = f"qg{transition['run_id']}"
@@ -41,38 +39,39 @@ def create_tsid(transition,list_df):
     df["Climate proxy"] = "Kinetic Energy"
     df["tsid"] = transition["tsid"]
     list_df.append(df)
+
+
 # df.plot(x='Age',y='Proxy')
 
-list_df = []
+def organise_data():
+    list_df = []
 
-transitions = [#{"run_id": "015",
-               # "transition": 5000,
-               # "tsid": 1},
-               {"run_id": "016",
-                "start_age": 2000,
-                "end_age": 3500,
-                "transition": 2750,
-                "tsid": 1},
-               {"run_id": "017",
-                "start_age": 400,
-                "end_age": 1250,
-                "transition": 800,
-                "tsid": 2},
-               {"run_id": "018",
-                "start_age": 500,
-                "end_age": 1500,
-                "transition": 1000,
-                "tsid": 3},]
+    transitions = [
+        {"run_id": "016",
+         "start_age": 2000,
+         "end_age": 3500,
+         "transition": 2750,
+         "tsid": 1},
+        {"run_id": "017",
+         "start_age": 400,
+         "end_age": 1250,
+         "transition": 800,
+         "tsid": 2},
+        {"run_id": "018",
+         "start_age": 500,
+         "end_age": 1500,
+         "transition": 1000,
+         "tsid": 3}, ]
 
-for transition in transitions:
-    create_tsid(transition,list_df)
+    for transition in transitions:
+        create_tsid(transition, list_df)
 
-# ------------
-# Concatenate dataframes
-# --------------
+    # ------------
+    # Concatenate dataframes
+    # --------------
 
-df_full = pd.concat(list_df)
-df_full.to_csv("data/transition_data.csv", index=False)
+    df_full = pd.concat(list_df)
+    df_full.to_csv("data/transition_data.csv", index=False)
 
 # len(df[df['Age']>=df['Transition'].iloc[0]])
 
@@ -244,6 +243,3 @@ df_full.to_csv("data/transition_data.csv", index=False)
 # df["Climate proxy"] = "d2H (%)"
 # df["tsid"] = 8
 # list_df.append(df)
-
-
-

@@ -15,15 +15,6 @@ import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
 import scipy.stats as stats
 
-# Import EWS from forced Dakos climate transitions
-df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
-df_ews_forced.set_index(["tsid", "Time"], inplace=True)
-
-# Import EWS from null Dakos climate transitions
-df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
-df_ews_null.set_index(["tsid", "Null number", "Time"], inplace=True)
-
-
 # Function to compute kendall tau for time seires data up to point t_fin
 def ktau_compute(series, t_fin):
     # selected data in series where from point where measured variable
@@ -50,56 +41,32 @@ def ktau_series(series):
     return ktauSeries
 
 
-# -------------
-# Compute kendall tau for forced simulations
-# ------------
+def compute_ktau():
+    # Import EWS from forced Dakos climate transitions
+    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
+    df_ews_forced.set_index(["tsid", "Time"], inplace=True)
 
-# Store list of dfs with kendall tau values from each simulation
-list_df = []
-
-# Loop through each time series ID
-tsid_vals = df_ews_forced.index.unique(level="tsid")
-for tsid in tsid_vals:
-
-    series_var = df_ews_forced.loc[tsid]["variance"]
-    series_ac = df_ews_forced.loc[tsid]["ac1"]
-
-    # Compute kendall tau series
-    series_ktau_var = ktau_series(series_var)
-    series_ktau_var.name = "ktau_variance"
-    series_ktau_ac = ktau_series(series_ac)
-    series_ktau_ac.name = "ktau_ac"
-
-    # Put into temporary dataframe
-    df_temp = pd.concat([series_ktau_var, series_ktau_ac], axis=1).reset_index()
-    df_temp["tsid"] = tsid
-    list_df.append(df_temp)
-    print("K tau done for tsid {}".format(tsid))
+    # Import EWS from null Dakos climate transitions
+    df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
+    df_ews_null.set_index(["tsid", "Null number", "Time"], inplace=True)
 
 
-# Concatenate kendall tau dataframes
-df_ktau_forced = pd.concat(list_df).set_index(["tsid", "Time"])
-
-# Export dataframe
-df_ktau_forced.to_csv("data/ews/df_ktau_forced.csv")
 
 
-# -------------
-# Compute kendall tau for null simulations
-# ------------
 
-# Store list of dfs with kendall tau values from each simulation
-list_df = []
+    # -------------
+    # Compute kendall tau for forced simulations
+    # ------------
 
+    # Store list of dfs with kendall tau values from each simulation
+    list_df = []
 
-tsid_vals = df_ews_null.index.unique(level="tsid")
-null_number_vals = df_ews_null.index.unique(level="Null number")
-# Loop through each time series ID
-for tsid in tsid_vals:
-    for null_number in null_number_vals:
+    # Loop through each time series ID
+    tsid_vals = df_ews_forced.index.unique(level="tsid")
+    for tsid in tsid_vals:
 
-        series_var = df_ews_null.loc[tsid, null_number]["variance"]
-        series_ac = df_ews_null.loc[tsid, null_number]["ac1"]
+        series_var = df_ews_forced.loc[tsid]["variance"]
+        series_ac = df_ews_forced.loc[tsid]["ac1"]
 
         # Compute kendall tau series
         series_ktau_var = ktau_series(series_var)
@@ -110,13 +77,50 @@ for tsid in tsid_vals:
         # Put into temporary dataframe
         df_temp = pd.concat([series_ktau_var, series_ktau_ac], axis=1).reset_index()
         df_temp["tsid"] = tsid
-        df_temp["Null number"] = null_number
         list_df.append(df_temp)
-        print("K tau done for null tsid {}".format(tsid))
+        print("K tau done for tsid {}".format(tsid))
 
 
-# Concatenate kendall tau dataframes
-df_ktau_null = pd.concat(list_df).set_index(["tsid", "Null number", "Time"])
+    # Concatenate kendall tau dataframes
+    df_ktau_forced = pd.concat(list_df).set_index(["tsid", "Time"])
 
-# Export dataframe
-df_ktau_null.to_csv("data/ews/df_ktau_null.csv")
+    # Export dataframe
+    df_ktau_forced.to_csv("data/ews/df_ktau_forced.csv")
+
+
+    # -------------
+    # Compute kendall tau for null simulations
+    # ------------
+
+    # Store list of dfs with kendall tau values from each simulation
+    list_df = []
+
+
+    tsid_vals = df_ews_null.index.unique(level="tsid")
+    null_number_vals = df_ews_null.index.unique(level="Null number")
+    # Loop through each time series ID
+    for tsid in tsid_vals:
+        for null_number in null_number_vals:
+
+            series_var = df_ews_null.loc[tsid, null_number]["variance"]
+            series_ac = df_ews_null.loc[tsid, null_number]["ac1"]
+
+            # Compute kendall tau series
+            series_ktau_var = ktau_series(series_var)
+            series_ktau_var.name = "ktau_variance"
+            series_ktau_ac = ktau_series(series_ac)
+            series_ktau_ac.name = "ktau_ac"
+
+            # Put into temporary dataframe
+            df_temp = pd.concat([series_ktau_var, series_ktau_ac], axis=1).reset_index()
+            df_temp["tsid"] = tsid
+            df_temp["Null number"] = null_number
+            list_df.append(df_temp)
+            print("K tau done for null tsid {}".format(tsid))
+
+
+    # Concatenate kendall tau dataframes
+    df_ktau_null = pd.concat(list_df).set_index(["tsid", "Null number", "Time"])
+
+    # Export dataframe
+    df_ktau_null.to_csv("data/ews/df_ktau_null.csv")

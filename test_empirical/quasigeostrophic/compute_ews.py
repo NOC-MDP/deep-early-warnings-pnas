@@ -20,29 +20,6 @@ import ewstools
 # from ewstools_temp import ews_compute
 import os
 
-os.makedirs("data/ews", exist_ok=True)
-os.makedirs("data/resids", exist_ok=True)
-
-
-# Import transition data
-df = pd.read_csv("data/transition_data.csv")
-
-# Record names
-list_records = df["Record"].unique()
-
-# Bandwidth sizes for Gaussian kernel (used in Dakos (2008) Table S3)
-# dic_bandwidth = {
-#     "End of greenhouse Earth": 25,
-#     "End of Younger Dryas": 100,
-#     "End of glaciation I": 25,
-#     "Bolling-Allerod transition": 25,
-#     "End of glaciation II": 25,
-#     "End of glaciation III": 10,
-#     "End of glaciation IV": 50,
-#     "Desertification of N. Africa": 10,
-# }
-
-
 # Function to do linear interpolation on data prior to transition
 def interpolate(df):
     """
@@ -75,40 +52,62 @@ def interpolate(df):
 
     return df_inter
 
+def compute_ews():
+    os.makedirs("data/ews", exist_ok=True)
+    os.makedirs("data/resids", exist_ok=True)
 
-# EWS computation parameters
-rw = 0.5  # half the length of the data
-bandwidth = 0.2
-# Loop through each record
-list_df = []
-i = 1
-for record in list_records:
 
-    # Get record specific data
-    df_select = df[df["Record"] == record]
-    # Get data prior to transtion and interpolate
-    df_inter = interpolate(df_select[["Age", "Proxy", "Transition"]])
+    # Import transition data
+    df = pd.read_csv("data/transition_data.csv")
 
-    # Make time negative so it increaes up to transition
-    df_inter["Age"] = -df_inter["Age"]
-    # Series for computing EWS
-    series = df_inter.set_index("Age")["Proxy"]
+    # Record names
+    list_records = df["Record"].unique()
 
-    ts = ewstools.TimeSeries(series)
-    ts.detrend(method="Lowess", bandwidth=bandwidth) #dic_bandwidth[record])
-    ts.compute_var(rolling_window=rw)
-    ts.compute_auto(rolling_window=rw, lag=1)
+    # Bandwidth sizes for Gaussian kernel (used in Dakos (2008) Table S3)
+    # dic_bandwidth = {
+    #     "End of greenhouse Earth": 25,
+    #     "End of Younger Dryas": 100,
+    #     "End of glaciation I": 25,
+    #     "Bolling-Allerod transition": 25,
+    #     "End of glaciation II": 25,
+    #     "End of glaciation III": 10,
+    #     "End of glaciation IV": 50,
+    #     "Desertification of N. Africa": 10,
+    # }
 
-    df_ews = ts.state.join(ts.ews)
-    df_ews["Record"] = record
-    df_ews["tsid"] = i
-    list_df.append(df_ews)
+    # EWS computation parameters
+    rw = 0.5  # half the length of the data
+    bandwidth = 0.2
+    # Loop through each record
+    list_df = []
+    i = 1
+    for record in list_records:
 
-    i += 1
+        # Get record specific data
+        df_select = df[df["Record"] == record]
+        # Get data prior to transtion and interpolate
+        df_inter = interpolate(df_select[["Age", "Proxy", "Transition"]])
 
-# Concatenate dataframes
-df_ews = pd.concat(list_df)
-df_ews.index.name = "Time"
+        # Make time negative so it increaes up to transition
+        df_inter["Age"] = -df_inter["Age"]
+        # Series for computing EWS
+        series = df_inter.set_index("Age")["Proxy"]
 
-# # Export
-df_ews.to_csv("data/ews/df_ews_forced.csv")
+        ts = ewstools.TimeSeries(series)
+        ts.detrend(method="Lowess", bandwidth=bandwidth) #dic_bandwidth[record])
+        ts.compute_var(rolling_window=rw)
+        ts.compute_auto(rolling_window=rw, lag=1)
+
+        df_ews = ts.state.join(ts.ews)
+        df_ews["Record"] = record
+        df_ews["tsid"] = i
+        list_df.append(df_ews)
+
+        i += 1
+
+    # Concatenate dataframes
+    df_ews = pd.concat(list_df)
+    df_ews.index.name = "Time"
+
+    # # Export
+    df_ews.to_csv("data/ews/df_ews_forced.csv")
