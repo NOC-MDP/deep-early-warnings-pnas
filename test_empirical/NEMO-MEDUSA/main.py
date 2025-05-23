@@ -25,7 +25,7 @@ class StreamToLoguru:
 
 
 def main():
-    five_hundred = True
+    five_hundred = False
     # Set up Loguru
     logger.remove()
     logger.add(sys.stderr, level="INFO")
