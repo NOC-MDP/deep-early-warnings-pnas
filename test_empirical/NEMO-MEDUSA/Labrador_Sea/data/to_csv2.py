@@ -71,15 +71,19 @@ def main():
             for lon0 in lon_values:
                 x_vals = []
                 mld_pt = []
-                with open(f"mldr10_1_{lat0}_{lon0}_monthly.csv", "r") as csvfile:
-                    reader = csv.reader(csvfile)
-                    for row in reader:
-                        try:
-                            x_vals.append(int(row[0]))
-                            mld_pt.append(float(row[1]))
-                        except ValueError:
-                            continue
-                    fig.add_trace(go.Scatter(x=x_vals, y=mld_pt, name=f"{lat0}_{lon0}"))
+                try:
+                    with open(f"mldr10_1_{lat0}_{lon0}_monthly.csv", "r") as csvfile:
+                        reader = csv.reader(csvfile)
+                        for row in reader:
+                            try:
+                                x_vals.append(int(row[0]))
+                                mld_pt.append(float(row[1]))
+                            except ValueError:
+                                continue
+                        fig.add_trace(go.Scatter(x=x_vals, y=mld_pt, name=f"{lat0}_{lon0}"))
+                except FileNotFoundError:
+                    print(f"mldr10_1_{lat0}_{lon0}_monthly.csv not found")
+                    continue
         fig.show()
 
 

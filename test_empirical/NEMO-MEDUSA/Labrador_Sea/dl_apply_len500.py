@@ -39,7 +39,7 @@ os.makedirs("data/ml_preds/500/", exist_ok=True)
 # Load all len500 DL classifiers -
 # --------------
 def dl_apply_len500(tsid_vals):
-    root_path = "../../dl_train/best_models_tf215/len500/"
+    root_path = "../../../dl_train/best_models_tf215/len500/"
     classifier_names = sorted(
         [name[:-6] for name in os.listdir(root_path) if name[-6:] == ".keras"]
     )

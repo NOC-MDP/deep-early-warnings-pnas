@@ -23,7 +23,7 @@ import re
 
 def create_tsid(transition, list_df):
     df = pd.read_csv(
-        f"data/mldr10_1_{transition['run_id']}_monthly.csv",
+        f"Labrador_Sea/data/mldr10_1_{transition['run_id']}_monthly.csv",
         header=0,
         names=["Age", "Proxy", ],
     )
