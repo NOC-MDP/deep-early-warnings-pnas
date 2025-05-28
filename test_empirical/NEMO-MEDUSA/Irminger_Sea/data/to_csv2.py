@@ -36,8 +36,8 @@ def main():
     lat_values = np.linspace(lat_min, lat_max, 5)
     lon_values = np.linspace(lon_min, lon_max, 5)
     first_time = True
-    create_plot = False
-    create_csv = True
+    create_plot = True
+    create_csv = False
 
     if create_csv:
         for lat0 in lat_values:
