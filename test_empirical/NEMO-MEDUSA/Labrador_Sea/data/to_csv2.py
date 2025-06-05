@@ -2,7 +2,7 @@ import netCDF4 as nc
 import csv
 import numpy as np
 import plotly.graph_objects as go
-
+import os
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -27,6 +27,13 @@ def find_closest_index(lat_array, lon_array, lat0, lon0):
 
 def main():
     directory = "/gws/nopw/j04/class_vol1/CLASS-MEDUSA/OUT_eORCA12/C001/monthly/"
+    parameter = "CHL" # CHL DIN or MLD
+    if parameter == "CHL" or parameter == "DIN":
+        grid = "ptrc_T"
+    elif parameter == "MLD":
+        grid = "grid_T"
+    else:
+        raise Exception(f"unknown parameter {parameter}")
     years = list(range(2000,2101,1))
     months = list(range(1,13,1))
     lat_min = 57.00
@@ -36,33 +43,43 @@ def main():
     lat_values = np.linspace(lat_min, lat_max, 5)
     lon_values = np.linspace(lon_min, lon_max, 5)
     first_time = True
-    create_plot = True
-    create_csv = False
+    create_plot = False
+    create_csv = True
 
     if create_csv:
+        os.makedirs(f"{parameter}{os.sep}", exist_ok=True)
         for lat0 in lat_values:
             for lon0 in lon_values:
-                with open(f"mldr10_1_{lat0}_{lon0}_monthly.csv", "w") as csvfile:
+                with open(f"{parameter}{os.sep}{parameter}_{lat0}_{lon0}_monthly.csv", "w") as csvfile:
                     writer = csv.writer(csvfile)
-                    header = ["x", "MLD"]
+                    header = ["x", parameter]
                     writer.writerow(header)
                     x = 1
                     for year in years:
                         for month in months:
-                            datafile = f"{directory}/{year}/eORCA12_MED_UKESM_y{year}m{month:02}_grid_T.nc"
+                            datafile = f"{directory}/{year}/eORCA12_MED_UKESM_y{year}m{month:02}_{grid}.nc"
                             ds = nc.Dataset(datafile)
-                            mld = ds.variables['mldr10_1'][:]
+                            if parameter == "CHL":
+                                par_chd = ds.variables["CHD"][:,0,:,:]
+                                par_chn = ds.variables["CHN"][:,0,:,:]
+                                par = par_chd + par_chn
+                            elif parameter == "DIN":
+                                par = ds.variables["DIN"][:, 0, :, :]
+                            elif parameter == "MLD":
+                                par = ds.variables["mldr10_1"][:]
+                            else:
+                                raise Exception(f"unknown parameter {parameter}")
                             # these just need to be loaded once since they shouldn't change across datasets
                             if first_time:
                                 nav_lat = ds.variables['nav_lat'][:]
                                 nav_lon = ds.variables['nav_lon'][:]
                                 i, j = find_closest_index(nav_lat, nav_lon, lat0, lon0)
                                 first_time = False
-                            mld_pt = mld[:,i, j]
-                            writer.writerow([x,mld_pt[0]])
+                            par_pt = par[:,i, j]
+                            writer.writerow([x,par_pt[0]])
                             x = x + 1
                 first_time = True
-                print(f"mldr10_1_{lat0}_{lon0}_monthly.csv written successfully")
+                print(f"{parameter}_{lat0}_{lon0}_monthly.csv written successfully")
 
     if create_plot:
         fig = go.Figure()
@@ -72,7 +89,7 @@ def main():
                 x_vals = []
                 mld_pt = []
                 try:
-                    with open(f"mldr10_1_{lat0}_{lon0}_monthly.csv", "r") as csvfile:
+                    with open(f"{parameter}{os.sep}{parameter}_{lat0}_{lon0}_monthly.csv", "r") as csvfile:
                         reader = csv.reader(csvfile)
                         for row in reader:
                             try:
@@ -82,7 +99,7 @@ def main():
                                 continue
                         fig.add_trace(go.Scatter(x=x_vals, y=mld_pt, name=f"{lat0}_{lon0}"))
                 except FileNotFoundError:
-                    print(f"mldr10_1_{lat0}_{lon0}_monthly.csv not found")
+                    print(f"{parameter}_{lat0}_{lon0}_monthly.csv not found")
                     continue
         fig.show()
 
