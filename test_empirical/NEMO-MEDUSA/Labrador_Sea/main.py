@@ -26,6 +26,7 @@ class StreamToLoguru:
 
 def main():
     parameter = "CHL"
+    logger.info(f"Running for Parameter: {parameter}")
     five_hundred = False
     # Set up Loguru
     logger.remove()
