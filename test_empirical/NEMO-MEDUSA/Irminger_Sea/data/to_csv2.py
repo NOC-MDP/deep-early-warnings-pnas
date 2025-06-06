@@ -51,7 +51,7 @@ def main():
                         for month in months:
                             datafile = f"{directory}/{year}/eORCA12_MED_UKESM_y{year}m{month:02}_grid_T.nc"
                             ds = nc.Dataset(datafile)
-                            mld = ds.variables['mldr10_1'][:]
+                            mld = ds.variables['MLD'][:]
                             # these just need to be loaded once since they shouldn't change across datasets
                             if first_time:
                                 nav_lat = ds.variables['nav_lat'][:]

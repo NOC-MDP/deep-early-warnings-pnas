@@ -43,8 +43,8 @@ def main():
     lat_values = np.linspace(lat_min, lat_max, 5)
     lon_values = np.linspace(lon_min, lon_max, 5)
     first_time = True
-    create_plot = False
-    create_csv = True
+    create_plot = True
+    create_csv = False
 
     if create_csv:
         os.makedirs(f"{parameter}{os.sep}", exist_ok=True)
@@ -66,7 +66,7 @@ def main():
                             elif parameter == "DIN":
                                 par = ds.variables["DIN"][:, 0, :, :]
                             elif parameter == "MLD":
-                                par = ds.variables["mldr10_1"][:]
+                                par = ds.variables["MLD"][:]
                             else:
                                 raise Exception(f"unknown parameter {parameter}")
                             # these just need to be loaded once since they shouldn't change across datasets

@@ -16,7 +16,7 @@ import plotly.express as px
 
 import ewstools
 
-def generate_nulls_ar1():
+def generate_nulls_ar1(parameter:str):
     # Set random number seed
     np.random.seed(0)
 
@@ -36,10 +36,10 @@ def generate_nulls_ar1():
 
 
     # Import transition data
-    df = pd.read_csv("data/transition_data.csv")
+    df = pd.read_csv(f"data/{parameter}/{parameter}_transition_data.csv")
 
     # Import ews data
-    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
+    df_ews_forced = pd.read_csv(f"results/{parameter}/ews/df_ews_forced.csv")
     list_tsid = df_ews_forced["tsid"].unique()
     #list_tsid = [1]
     # Number of null time series to generate for each record
@@ -123,7 +123,7 @@ def generate_nulls_ar1():
     df_ews.index.name = "Time"
 
     # Export EWS
-    df_ews.to_csv("data/ews/df_ews_null.csv")
+    df_ews.to_csv(f"results/{parameter}/ews/df_ews_null.csv")
 
 if __name__ == "__main__":
-    generate_nulls_ar1()
+    generate_nulls_ar1(parameter="CHL")

@@ -27,7 +27,7 @@ def main():
 
     datafile = "MLD_maxes2000-2100.nc"
     ds = nc.Dataset(datafile)
-    mld = ds.variables['mldr10_1'][:]
+    mld = ds.variables['MLD'][:]
     nav_lat = ds.variables['nav_lat'][:]
     nav_lon = ds.variables['nav_lon'][:]
     time_counter = ds.variables['time_counter'][:]

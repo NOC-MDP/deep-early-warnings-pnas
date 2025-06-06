@@ -25,7 +25,8 @@ class StreamToLoguru:
 
 
 def main():
-    five_hundred = True
+    parameter = "CHL"
+    five_hundred = False
     # Set up Loguru
     logger.remove()
     logger.add(sys.stderr, level="INFO")
@@ -36,38 +37,38 @@ def main():
 
     logger.info("Starting NEMO-MEDUSA prediction")
     logger.info("cleaning output directories")
-    clean(five_hundred=five_hundred)
+    clean(five_hundred=five_hundred,parameter=parameter)
     logger.success("Done")
     logger.info("organising data")
-    organise_data()
+    organise_data(parameter=parameter)
     logger.success("Done")
     logger.info("computing ews")
-    compute_ews()
+    compute_ews(parameter=parameter)
     logger.success("Done")
     logger.info("generating nulls")
-    generate_nulls_ar1()
+    generate_nulls_ar1(parameter=parameter)
     logger.success("Done")
     logger.info("computing ktau")
-    compute_ktau()
+    compute_ktau(parameter=parameter)
     logger.success("Done")
     logger.info("generating ML predictions")
     #tsid_vals = [1, 2, 3,4,5]
     tsid_vals = list(range(1,25))
     if five_hundred:
-        dl_apply_len500(tsid_vals=tsid_vals)
+        dl_apply_len500(tsid_vals=tsid_vals,parameter=parameter)
     else:
-        dl_apply_len1500(tsid_vals=tsid_vals)
+        dl_apply_len1500(tsid_vals=tsid_vals,parameter=parameter)
     logger.success("Done")
     logger.info("organising ML predictions")
-    organise_ml_data(five_hundred=five_hundred)
+    organise_ml_data(five_hundred=five_hundred,parameter=parameter)
     logger.success("Done")
     logger.info("computing roc")
     if five_hundred:
-        compute_roc(bool_pred_early=True,five_hundred=True)
-        compute_roc(bool_pred_early=False,five_hundred=True)
+        compute_roc(bool_pred_early=True,five_hundred=True,parameter=parameter)
+        compute_roc(bool_pred_early=False,five_hundred=True,parameter=parameter)
     else:
-        compute_roc(bool_pred_early=True)
-        compute_roc(bool_pred_early=False)
+        compute_roc(bool_pred_early=True,parameter=parameter)
+        compute_roc(bool_pred_early=False,parameter=parameter)
     logger.success("Ran all tasks successfully!")
 
 

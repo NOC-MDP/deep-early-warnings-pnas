@@ -15,7 +15,7 @@ import glob
 import re
 import os
 
-def organise_ml_data(five_hundred=False):
+def organise_ml_data(parameter:str,five_hundred=False):
     # # ML model number
     # ml_number = "Protocol3_Jan21_len500"
 
@@ -25,11 +25,11 @@ def organise_ml_data(five_hundred=False):
     # Spacing between ML data points
     # ml_spacing = int(classifier_length / 50)
     if five_hundred:
-        os.makedirs("data/ml_preds/500/parsed/", exist_ok=True)
-        path = "data/ml_preds/500/"
+        os.makedirs(f"results/{parameter}/ml_preds/500/parsed/", exist_ok=True)
+        path = f"results/{parameter}/ml_preds/500/"
     else:
-        os.makedirs("data/ml_preds/1500/parsed/", exist_ok=True)
-        path = "data/ml_preds/1500/"
+        os.makedirs(f"results/{parameter}/ml_preds/1500/parsed/", exist_ok=True)
+        path = f"results/{parameter}/ml_preds/1500/"
 
     # # Import EWS data (need time values for plot)
     # df_ews = pd.read_csv("data/ews/df_ews_forced.csv")
@@ -71,11 +71,11 @@ def organise_ml_data(five_hundred=False):
 
     if five_hundred:
         # # Export ML dataframe
-        filepath = "data/ml_preds/500/parsed/"
+        filepath = f"results/{parameter}/ml_preds/500/parsed/"
         df_ml_forced.to_csv(filepath + "df_ml_forced.csv", index=False)
     else:
         # # Export ML dataframe
-        filepath = "data/ml_preds/1500/parsed/"
+        filepath = f"results/{parameter}/ml_preds/1500/parsed/"
         df_ml_forced.to_csv(filepath + "df_ml_forced.csv", index=False)
 
     # ----------------
@@ -108,16 +108,16 @@ def organise_ml_data(five_hundred=False):
 
     if five_hundred:
         # # Export ML dataframe
-        filepath = "data/ml_preds/500/parsed/"
+        filepath = f"results/{parameter}/ml_preds/500/parsed/"
         df_ml_null.to_csv(filepath + "df_ml_null.csv", index=False)
 
     else:
         # # Export ML dataframe
-        filepath = "data/ml_preds/1500/parsed/"
+        filepath = f"results/{parameter}/ml_preds/1500/parsed/"
         df_ml_null.to_csv(filepath + "df_ml_null.csv", index=False)
 # ------
 if __name__ == "__main__":
-    organise_ml_data()
+    organise_ml_data(parameter="CHL")
 
 # # ---------------
 # # Organise forced trajectory data into df

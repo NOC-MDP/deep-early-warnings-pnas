@@ -8,6 +8,7 @@ Use time ranges and transition times as given in Table S1 Dakos 2008
 
 @author: Thomas M. Bury
 """
+import json
 
 import numpy as np
 import pandas as pd
@@ -15,173 +16,55 @@ import pandas as pd
 import glob
 import re
 
+from lmfit import parameter
+
 
 # ----------------
 # Import and organise data
 # –------------------
 
 
-def create_tsid(transition, list_df):
+def create_tsid(transition, list_df,parameter:str):
     df = pd.read_csv(
-        f"Labrador_Sea/data/mldr10_1_{transition['run_id']}_monthly.csv",
+        f"data/{parameter}/{parameter}_{transition['run_id']}_monthly.csv",
         header=0,
         names=["Age", "Proxy", ],
     )
+    # TODO need to do better than just assuming a month is always 31 days
     # convert to days
-    df["Age"] = df["Age"] * 365
+    df["Age"] = df["Age"] * 31
     df = (
-        df[(df["Age"] <= transition["end_age"] * 365) & (df["Age"] >= transition["start_age"] * 365)]
+        df[(df["Age"] <= transition["end_age"] * 31) & (df["Age"] >= transition["start_age"] * 31)]
         .sort_values("Age", ascending=False)
         .reset_index(drop=True)
     )
     df["Record"] = f"NM_{transition['run_id']}"
-    df["Transition"] = transition["transition"] * 365
-    df["Climate proxy"] = "Mixed Layer Depth"
+    df["Transition"] = transition["transition"] * 31
+    df["Climate proxy"] = parameter
     df["tsid"] = transition["tsid"]
     list_df.append(df)
 
 
 # df.plot(x='Age',y='Proxy')
 
-def organise_data():
+def organise_data(parameter:str):
     list_df = []
 
-    transitions = [
-        {"run_id": "57.0_-54.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 507,
-         "tsid": 1},
-        {"run_id": "57.0_-52.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 494,
-         "tsid": 2},
-        {"run_id": "57.0_-49.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 495,
-         "tsid": 3},
-        {"run_id": "57.0_-47.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 698,
-         "tsid": 4},
-        {"run_id": "57.75_-57.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 712,
-         "tsid": 5},
-        {"run_id": "57.75_-54.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 458,
-         "tsid": 6},
-        {"run_id": "57.75_-52.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 459,
-         "tsid": 7},
-        {"run_id": "57.75_-49.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 459,
-         "tsid": 8},
-        {"run_id": "57.75_-47.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 736,
-         "tsid": 9},
-        {"run_id": "58.5_-57.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 615,
-         "tsid": 10},
-        {"run_id": "58.5_-54.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 457,
-         "tsid": 11},
-        {"run_id": "58.5_-52.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 470,
-         "tsid": 12},
-        {"run_id": "58.5_-49.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 471,
-         "tsid": 13},
-        {"run_id": "58.5_-47.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 591,
-         "tsid": 14},
-        {"run_id": "59.25_-57.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 494,
-         "tsid": 15},
-        {"run_id": "59.25_-54.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 458,
-         "tsid": 16},
-        {"run_id": "59.25_-52.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 530,
-         "tsid": 17},
-        {"run_id": "59.25_-49.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 591,
-         "tsid": 18},
-        {"run_id": "59.25_-47.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 567,
-         "tsid": 19},
-        {"run_id": "60.0_-57.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 495,
-         "tsid": 20},
-        {"run_id": "60.0_-54.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 520,
-         "tsid": 21},
-        {"run_id": "60.0_-52.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 519,
-         "tsid": 22},
-        {"run_id": "60.0_-49.5",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 578,
-         "tsid": 23},
-        {"run_id": "60.0_-47.0",
-         "start_age": 1,
-         "end_age": 1212,
-         "transition": 577,
-         "tsid": 24},
+    with open(f"data/{parameter}/{parameter}_transitions.json") as f:
+        transitions = json.load(f)
 
-    ]
-
-    for transition in transitions:
-        create_tsid(transition, list_df)
+    for transition in transitions["transitions"]:
+        create_tsid(transition, list_df,parameter)
 
     # ------------
     # Concatenate dataframes
     # --------------
 
     df_full = pd.concat(list_df)
-    df_full.to_csv("data/transition_data.csv", index=False)
+    df_full.to_csv(f"data/{parameter}/{parameter}_transition_data.csv", index=False)
 
 if __name__ == "__main__":
-    organise_data()
+    organise_data(parameter="CHL")
 # len(df[df['Age']>=df['Transition'].iloc[0]])
 
 

@@ -341,11 +341,11 @@ def compute_roc(bool_pred_early=False,five_hundred = False):
     )
     if five_hundred:
         fig.write_image(
-            "figures/figs_roc/500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            "figures/figs_roc_MLD/500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
         )
     else:
         fig.write_image(
-            "figures/figs_roc/1500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            "figures/figs_roc_MLD/1500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
         )
 
 if __name__ == "__main__":

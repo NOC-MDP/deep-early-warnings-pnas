@@ -41,13 +41,13 @@ def ktau_series(series):
     return ktauSeries
 
 
-def compute_ktau():
+def compute_ktau(parameter:str):
     # Import EWS from forced Dakos climate transitions
-    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
+    df_ews_forced = pd.read_csv(f"results/{parameter}/ews/df_ews_forced.csv")
     df_ews_forced.set_index(["tsid", "Time"], inplace=True)
 
     # Import EWS from null Dakos climate transitions
-    df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
+    df_ews_null = pd.read_csv(f"results/{parameter}/ews/df_ews_null.csv")
     df_ews_null.set_index(["tsid", "Null number", "Time"], inplace=True)
 
 
@@ -85,7 +85,7 @@ def compute_ktau():
     df_ktau_forced = pd.concat(list_df).set_index(["tsid", "Time"])
 
     # Export dataframe
-    df_ktau_forced.to_csv("data/ews/df_ktau_forced.csv")
+    df_ktau_forced.to_csv(f"results/{parameter}/ews/df_ktau_forced.csv")
 
 
     # -------------
@@ -123,7 +123,7 @@ def compute_ktau():
     df_ktau_null = pd.concat(list_df).set_index(["tsid", "Null number", "Time"])
 
     # Export dataframe
-    df_ktau_null.to_csv("data/ews/df_ktau_null.csv")
+    df_ktau_null.to_csv(f"results/{parameter}/ews/df_ktau_null.csv")
 
 if __name__ == "__main__":
-    compute_ktau()
+    compute_ktau(parameter="CHL")

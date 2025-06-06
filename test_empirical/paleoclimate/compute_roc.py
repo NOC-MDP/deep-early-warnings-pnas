@@ -330,5 +330,5 @@ fig.update_layout(
 )
 
 fig.write_image(
-    "figures/figs_roc/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+    "figures/figs_roc_MLD/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
 )

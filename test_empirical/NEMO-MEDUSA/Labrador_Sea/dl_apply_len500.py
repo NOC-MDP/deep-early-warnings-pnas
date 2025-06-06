@@ -32,13 +32,14 @@ import ewstools
 
 from tensorflow.keras.models import load_model
 
-os.makedirs("data/ml_preds/500/", exist_ok=True)
+
 
 
 # -------------
 # Load all len500 DL classifiers -
 # --------------
-def dl_apply_len500(tsid_vals):
+def dl_apply_len500(tsid_vals,parameter:str):
+    os.makedirs(f"results/{parameter}/ml_preds/500/", exist_ok=True)
     root_path = "../../../dl_train/best_models_tf215/len500/"
     classifier_names = sorted(
         [name[:-6] for name in os.listdir(root_path) if name[-6:] == ".keras"]
@@ -52,7 +53,7 @@ def dl_apply_len500(tsid_vals):
     # -----------
     # Get ensemble predictions for forced residual time series
     # ------------
-    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
+    df_ews_forced = pd.read_csv(f"results/{parameter}/ews/df_ews_forced.csv")
     for tsid in tsid_vals:
         print(f"compute dl predictions for tsid={tsid}")
         series = df_ews_forced[(df_ews_forced["tsid"] == tsid)].set_index("Time")[
@@ -75,7 +76,7 @@ def dl_apply_len500(tsid_vals):
 
         # Export
         dl_preds_mean.to_csv(
-            f"data/ml_preds/500/ensemble_trend_probs_dakos_forced_{tsid}.csv",
+            f"results/{parameter}/ml_preds/500/ensemble_trend_probs_dakos_forced_{tsid}.csv",
         )
 
 
@@ -83,7 +84,7 @@ def dl_apply_len500(tsid_vals):
     # Get ensemble predictions for null residual time series
     # ------------
 
-    df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
+    df_ews_null = pd.read_csv(f"results/{parameter}/ews/df_ews_null.csv")
     null_numbers = df_ews_null["Null number"].unique()
 
     for tsid in tsid_vals:
@@ -113,5 +114,5 @@ def dl_apply_len500(tsid_vals):
 
             # Export
             dl_preds_mean.to_csv(
-                f"data/ml_preds/500/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
+                f"results/{parameter}/ml_preds/500/ensemble_trend_probs_dakos_null_{tsid}_{null_number}.csv",
             )

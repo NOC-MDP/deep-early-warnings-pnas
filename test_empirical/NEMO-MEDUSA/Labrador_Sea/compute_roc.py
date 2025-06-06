@@ -24,6 +24,8 @@ import sklearn.metrics as metrics
 import scipy.stats as stats
 import os
 
+from lmfit import parameter
+
 
 # Function to compute ROC data from truth and indicator vals
 # and return a df.
@@ -40,29 +42,29 @@ def roc_compute(truth_vals, indicator_vals):
 
     return df_roc
 
-def compute_roc(bool_pred_early=False,five_hundred = False):
-    os.makedirs("data/roc/1500", exist_ok=True)
-    os.makedirs("data/roc/500", exist_ok=True)
+def compute_roc(parameter:str,bool_pred_early=False,five_hundred = False):
+    os.makedirs(f"results/{parameter}/roc/1500", exist_ok=True)
+    os.makedirs(f"results/{parameter}/roc/500", exist_ok=True)
     # --------
     # Import EWS and ML data
     # –------------
 
     # Import EWS data
-    df_ews_forced = pd.read_csv("data/ews/df_ews_forced.csv")
-    df_ews_null = pd.read_csv("data/ews/df_ews_null.csv")
+    df_ews_forced = pd.read_csv(f"results/{parameter}/ews/df_ews_forced.csv")
+    df_ews_null = pd.read_csv(f"results/{parameter}/ews/df_ews_null.csv")
 
     # Import kendall tau data
-    df_ktau_forced = pd.read_csv("data/ews/df_ktau_forced.csv")
-    df_ktau_null = pd.read_csv("data/ews/df_ktau_null.csv")
+    df_ktau_forced = pd.read_csv(f"results/{parameter}/ews/df_ktau_forced.csv")
+    df_ktau_null = pd.read_csv(f"results/{parameter}/ews/df_ktau_null.csv")
 
     if five_hundred:
         # Import ML predictions
-        df_ml_forced = pd.read_csv("data/ml_preds/500/parsed/df_ml_forced.csv")
-        df_ml_null = pd.read_csv("data/ml_preds/500/parsed/df_ml_null.csv")
+        df_ml_forced = pd.read_csv(f"results/{parameter}/ml_preds/500/parsed/df_ml_forced.csv")
+        df_ml_null = pd.read_csv(f"results/{parameter}/ml_preds/500/parsed/df_ml_null.csv")
     else:
         # Import ML predictions
-        df_ml_forced = pd.read_csv("data/ml_preds/1500/parsed/df_ml_forced.csv")
-        df_ml_null = pd.read_csv("data/ml_preds/1500/parsed/df_ml_null.csv")
+        df_ml_forced = pd.read_csv(f"results/{parameter}/ml_preds/1500/parsed/df_ml_forced.csv")
+        df_ml_null = pd.read_csv(f"results/{parameter}/ml_preds/1500/parsed/df_ml_null.csv")
 
     # Add column for truth values (1 for forced, 0 for null)
     df_ktau_forced["truth value"] = 1
@@ -191,14 +193,15 @@ def compute_roc(bool_pred_early=False,five_hundred = False):
             "null": [null_count],
         }
     )
+    export_path = f"results/{parameter}/"
     if five_hundred:
         # Export data on bifurcation prediction counts
-        filepath = "data/roc/500/df_bif_pred_counts_{}.csv".format(
+        filepath = export_path+"roc/500/df_bif_pred_counts_{}.csv".format(
             "early" if bool_pred_early else "late"
         )
     else:
         # Export data on bifurcation prediction counts
-        filepath = "data/roc/1500/df_bif_pred_counts_{}.csv".format(
+        filepath = export_path + "roc/1500/df_bif_pred_counts_{}.csv".format(
             "early" if bool_pred_early else "late"
         )
 
@@ -260,9 +263,9 @@ def compute_roc(bool_pred_early=False,five_hundred = False):
 
     # Export ROC data
     if five_hundred:
-        filepath = "data/roc/500/df_roc_dakos_{}.csv".format("early" if bool_pred_early else "late")
+        filepath = export_path + "roc/500/df_roc_dakos_{}.csv".format("early" if bool_pred_early else "late")
     else:
-        filepath = "data/roc/1500/df_roc_dakos_{}.csv".format("early" if bool_pred_early else "late")
+        filepath = export_path + "roc/1500/df_roc_dakos_{}.csv".format("early" if bool_pred_early else "late")
 
     df_roc_dakos_climate.to_csv(
         filepath,
@@ -339,14 +342,15 @@ def compute_roc(bool_pred_early=False,five_hundred = False):
         height=600,
         title="ROC, NEMO-MEDUSA Model",
     )
+    fig_dir = f"figures/figs_roc_{parameter}/"
     if five_hundred:
         fig.write_image(
-            "figures/figs_roc/500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            fig_dir + "500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
         )
     else:
         fig.write_image(
-            "figures/figs_roc/1500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            fig_dir + "1500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
         )
 
 if __name__ == "__main__":
-    compute_roc()
+    compute_roc(parameter="CHL")

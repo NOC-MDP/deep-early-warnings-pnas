@@ -52,13 +52,13 @@ def interpolate(df):
 
     return df_inter
 
-def compute_ews():
-    os.makedirs("data/ews", exist_ok=True)
-    os.makedirs("data/resids", exist_ok=True)
+def compute_ews(parameter:str):
+    os.makedirs(f"results/{parameter}/ews", exist_ok=True)
+    os.makedirs(f"results/{parameter}/resids", exist_ok=True)
 
 
     # Import transition data
-    df = pd.read_csv("data/transition_data.csv")
+    df = pd.read_csv(f"data/{parameter}/{parameter}_transition_data.csv")
 
     # Record names
     list_records = df["Record"].unique()
@@ -110,7 +110,7 @@ def compute_ews():
     df_ews.index.name = "Time"
 
     # # Export
-    df_ews.to_csv("data/ews/df_ews_forced.csv")
+    df_ews.to_csv(f"results/{parameter}/ews/df_ews_forced.csv")
 
 if __name__ == "__main__":
-    compute_ews()
+    compute_ews(parameter="CHL")
