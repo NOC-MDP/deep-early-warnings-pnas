@@ -27,7 +27,7 @@ def find_closest_index(lat_array, lon_array, lat0, lon0):
 
 def main():
     directory = "/gws/nopw/j04/class_vol1/CLASS-MEDUSA/OUT_eORCA12/C001/monthly/"
-    parameter = "CHL" # CHL DIN or MLD
+    parameter = "DIN" # CHL DIN or MLD
     if parameter == "CHL" or parameter == "DIN":
         grid = "ptrc_T"
     elif parameter == "MLD":

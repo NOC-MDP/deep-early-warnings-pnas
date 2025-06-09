@@ -25,7 +25,7 @@ class StreamToLoguru:
 
 
 def main():
-    parameter = "CHL"
+    parameter = "DIN"
     logger.info(f"Running for Parameter: {parameter}")
     five_hundred = False
     # Set up Loguru

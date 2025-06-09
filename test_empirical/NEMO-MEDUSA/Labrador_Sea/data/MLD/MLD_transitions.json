@@ -1,13 +1,6 @@
 {
   "transitions": [
     {
-      "run_id": "57.0_-57.0",
-      "start_age": 1,
-      "end_age": 1212,
-      "transition": 507,
-      "tsid": 1
-    },
-    {
       "run_id": "57.0_-54.5",
       "start_age": 1,
       "end_age": 1212,
