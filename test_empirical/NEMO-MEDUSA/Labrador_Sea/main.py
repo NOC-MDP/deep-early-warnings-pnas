@@ -9,6 +9,7 @@ from compute_roc import compute_roc
 from clean import clean
 import sys
 from loguru import logger
+import click
 
 # captures print statements and converts them to log info statements
 class StreamToLoguru:
@@ -23,11 +24,18 @@ class StreamToLoguru:
     def flush(self):
         pass  # No need to implement flush for loguru
 
-
-def main():
-    parameter = "DIN"
+@click.command()
+@click.option('--parameter',required=True,help="parameter to use in prediction")
+@click.option('--five_hundred',is_flag=True,help="run 500 length timeseries predictor if true 1500 if not")
+def main(parameter:str,five_hundred:bool):
+    if parameter not in ["MLD", "CHL", "DIN", "TOS","ZOS"]:
+        raise Exception(f"unknown parameter: {parameter}")
     logger.info(f"Running for Parameter: {parameter}")
-    five_hundred = False
+    if five_hundred:
+        logger.info("Running with 500 length timeseries predictor")
+    else:
+        logger.info("Running with 1500 length timeseries predictor")
+
     # Set up Loguru
     logger.remove()
     logger.add(sys.stderr, level="INFO")

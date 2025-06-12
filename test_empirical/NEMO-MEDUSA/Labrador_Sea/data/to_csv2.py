@@ -27,10 +27,10 @@ def find_closest_index(lat_array, lon_array, lat0, lon0):
 
 def main():
     directory = "/gws/nopw/j04/class_vol1/CLASS-MEDUSA/OUT_eORCA12/C001/monthly/"
-    parameter = "DIN" # CHL DIN or MLD
+    parameter = "ZOS" # CHL DIN MLD TOS ZOS
     if parameter == "CHL" or parameter == "DIN":
         grid = "ptrc_T"
-    elif parameter == "MLD":
+    elif parameter == "MLD" or parameter == "TOS" or parameter == "ZOS":
         grid = "grid_T"
     else:
         raise Exception(f"unknown parameter {parameter}")
@@ -67,6 +67,10 @@ def main():
                                 par = ds.variables["DIN"][:, 0, :, :]
                             elif parameter == "MLD":
                                 par = ds.variables["MLD"][:]
+                            elif parameter == "TOS":
+                                par = ds.variables["tos"][:]
+                            elif parameter == "ZOS":
+                                par = ds.variables["zos"][:]
                             else:
                                 raise Exception(f"unknown parameter {parameter}")
                             # these just need to be loaded once since they shouldn't change across datasets
