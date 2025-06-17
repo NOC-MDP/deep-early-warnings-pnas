@@ -40,7 +40,7 @@ from tensorflow.keras.models import load_model
 # --------------
 def dl_apply_len500(tsid_vals,parameter:str,region:str):
     os.makedirs(f"{region}/results/{parameter}/ml_preds/500/", exist_ok=True)
-    root_path = "../../../dl_train/best_models_tf215/len500/"
+    root_path = "../../dl_train/best_models_tf215/len500/"
     classifier_names = sorted(
         [name[:-6] for name in os.listdir(root_path) if name[-6:] == ".keras"]
     )

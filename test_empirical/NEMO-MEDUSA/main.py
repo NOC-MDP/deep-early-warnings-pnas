@@ -10,6 +10,7 @@ from scripts.clean import clean
 import sys
 from loguru import logger
 import click
+import json
 
 # captures print statements and converts them to log info statements
 class StreamToLoguru:
@@ -29,8 +30,14 @@ class StreamToLoguru:
 @click.option("--region",default="Labrador_Sea",help="region to apply predictions")
 @click.option('--five_hundred',is_flag=True,help="run 500 length timeseries predictor if true 1500 if not")
 def main(parameter:str,five_hundred:bool,region:str):
-    # TODO get from the transitions json file
-    tsid_vals = list(range(1,25))
+    # Set up Loguru
+    logger.remove()
+    logger.add(sys.stderr, level="INFO")
+
+    # Redirect stdout and stderr
+    sys.stdout = StreamToLoguru("INFO")
+    sys.stderr = StreamToLoguru("ERROR")
+
     # valid parameter
     if parameter not in ["MLD", "CHL", "DIN", "TOS","ZOS"]:
         raise Exception(f"unknown parameter: {parameter}")
@@ -46,13 +53,12 @@ def main(parameter:str,five_hundred:bool,region:str):
     else:
         logger.info("Running with 1500 length timeseries predictor")
 
-    # Set up Loguru
-    logger.remove()
-    logger.add(sys.stderr, level="INFO")
-
-    # Redirect stdout and stderr
-    sys.stdout = StreamToLoguru("INFO")
-    sys.stderr = StreamToLoguru("ERROR")
+    # get number of predictions or tsid's
+    with open(f"{region}/data/{parameter}/{region}_{parameter}_transitions.json") as f:
+        transitions = json.load(f)
+    tsid_num = transitions["transitions"].__len__()
+    tsid_vals = list(range(1,tsid_num+1))
+    logger.info(f"predicting for {tsid_num+1} tsid's")
 
     logger.info("Starting NEMO-MEDUSA prediction")
     logger.info("cleaning output directories")

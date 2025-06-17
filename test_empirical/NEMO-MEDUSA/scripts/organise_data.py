@@ -56,7 +56,7 @@ def create_tsid(transition, list_df,parameter:str,region:str):
 def organise_data(parameter:str,region:str):
     list_df = []
 
-    with open(f"{region}/data/{parameter}/{parameter}_transitions.json") as f:
+    with open(f"{region}/data/{parameter}/{region}_{parameter}_transitions.json") as f:
         transitions = json.load(f)
 
     for transition in transitions["transitions"]:

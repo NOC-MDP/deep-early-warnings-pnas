@@ -1,7 +1,6 @@
 import netCDF4 as nc
 import csv
 import numpy as np
-import plotly.graph_objects as go
 import os
 import click
 from loguru import logger
@@ -31,13 +30,10 @@ def find_closest_index(lat_array, lon_array, lat0, lon0):
 @click.option('--parameter',required=True,help="parameter to use in prediction")
 @click.option("--region",default="Labrador_Sea",help="region to apply predictions")
 @click.option("--grid_size",default=5,help="length of grid x and y to overlay region")
-def main(parameter:str,region:str,grid_size:int):
+def create_csv(parameter:str,region:str,grid_size:int):
     logger.info("starting compilation of monthy mean data into csv files")
     logger.info(f"parameter requested: {parameter}")
     logger.info(f"region selected: {region}")
-
-    create_plot = False
-    create_csv = True
 
     directory = "/gws/nopw/j04/class_vol1/CLASS-MEDUSA/OUT_eORCA12/C001/monthly/"
     years = list(range(2000,2101,1))
@@ -82,67 +78,44 @@ def main(parameter:str,region:str,grid_size:int):
     lon_values = np.linspace(lon_min, lon_max, grid_size)
     first_time = True
 
-    if create_csv:
-        os.makedirs(f"{region}{os.sep}data{os.sep}{parameter}{os.sep}", exist_ok=True)
-        for lat0 in lat_values:
-            for lon0 in lon_values:
-                with open(f"{region}{os.sep}data{os.sep}{parameter}{os.sep}{parameter}_{lat0}_{lon0}_monthly.csv", "w") as csvfile:
-                    writer = csv.writer(csvfile)
-                    header = ["x", parameter]
-                    writer.writerow(header)
-                    x = 1
-                    for year in years:
-                        for month in months:
-                            datafile = f"{directory}/{year}/eORCA12_MED_UKESM_y{year}m{month:02}_{grid}.nc"
-                            ds = nc.Dataset(datafile)
-                            if parameter == "CHL":
-                                par_chd = ds.variables["CHD"][:,0,:,:]
-                                par_chn = ds.variables["CHN"][:,0,:,:]
-                                par = par_chd + par_chn
-                            elif parameter == "DIN":
-                                par = ds.variables["DIN"][:, 0, :, :]
-                            elif parameter == "MLD":
-                                par = ds.variables["mldr10_1"][:]
-                            elif parameter == "TOS":
-                                par = ds.variables["tos"][:]
-                            elif parameter == "ZOS":
-                                par = ds.variables["zos"][:]
-                            else:
-                                raise Exception(f"unknown parameter {parameter}")
-                            # these just need to be loaded once since they shouldn't change across datasets
-                            if first_time:
-                                nav_lat = ds.variables['nav_lat'][:]
-                                nav_lon = ds.variables['nav_lon'][:]
-                                i, j = find_closest_index(nav_lat, nav_lon, lat0, lon0)
-                                first_time = False
-                            par_pt = par[:,i, j]
-                            writer.writerow([x,par_pt[0]])
-                            x = x + 1
-                first_time = True
-                print(f"{parameter}_{lat0}_{lon0}_monthly.csv written successfully")
-
-    if create_plot:
-        fig = go.Figure()
-
-        for lat0 in lat_values:
-            for lon0 in lon_values:
-                x_vals = []
-                mld_pt = []
-                try:
-                    with open(f"{region}{os.sep}data{os.sep}{parameter}{os.sep}{parameter}_{lat0}_{lon0}_monthly.csv", "r") as csvfile:
-                        reader = csv.reader(csvfile)
-                        for row in reader:
-                            try:
-                                x_vals.append(int(row[0]))
-                                mld_pt.append(float(row[1]))
-                            except ValueError:
-                                continue
-                        fig.add_trace(go.Scatter(x=x_vals, y=mld_pt, name=f"{lat0}_{lon0}"))
-                except FileNotFoundError:
-                    print(f"{parameter}_{lat0}_{lon0}_monthly.csv not found")
-                    continue
-        fig.show()
+    os.makedirs(f"{region}/data/{parameter}/", exist_ok=True)
+    for lat0 in lat_values:
+        for lon0 in lon_values:
+            with open(f"{region}/data/{parameter}/{parameter}_{lat0}_{lon0}_monthly.csv", "w") as csvfile:
+                writer = csv.writer(csvfile)
+                header = ["x", parameter]
+                writer.writerow(header)
+                x = 1
+                for year in years:
+                    for month in months:
+                        datafile = f"{directory}/{year}/eORCA12_MED_UKESM_y{year}m{month:02}_{grid}.nc"
+                        ds = nc.Dataset(datafile)
+                        if parameter == "CHL":
+                            par_chd = ds.variables["CHD"][:,0,:,:]
+                            par_chn = ds.variables["CHN"][:,0,:,:]
+                            par = par_chd + par_chn
+                        elif parameter == "DIN":
+                            par = ds.variables["DIN"][:, 0, :, :]
+                        elif parameter == "MLD":
+                            par = ds.variables["mldr10_1"][:]
+                        elif parameter == "TOS":
+                            par = ds.variables["tos"][:]
+                        elif parameter == "ZOS":
+                            par = ds.variables["zos"][:]
+                        else:
+                            raise Exception(f"unknown parameter {parameter}")
+                        # these just need to be loaded once since they shouldn't change across datasets
+                        if first_time:
+                            nav_lat = ds.variables['nav_lat'][:]
+                            nav_lon = ds.variables['nav_lon'][:]
+                            i, j = find_closest_index(nav_lat, nav_lon, lat0, lon0)
+                            first_time = False
+                        par_pt = par[:,i, j]
+                        writer.writerow([x,par_pt[0]])
+                        x = x + 1
+            first_time = True
+            print(f"{parameter}_{lat0}_{lon0}_monthly.csv written successfully")
 
 
 if __name__ == "__main__":
-    main()
+    create_csv()

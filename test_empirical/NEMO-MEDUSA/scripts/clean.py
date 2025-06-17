@@ -1,3 +1,4 @@
+import glob
 from pathlib import Path
 import os
 
@@ -22,8 +23,8 @@ def clean(five_hundred:bool,parameter:str,region:str):
     delete_all_files_in_dir(f"{region}/results/{parameter}/ml_preds/{ts_len}")
     delete_all_files_in_dir(f"{region}/results/{parameter}/ml_preds/{ts_len}/parsed")
     delete_all_files_in_dir(f"{region}/results/{parameter}/roc/{ts_len}")
-    delete_all_files_in_dir(f"{region}/figures/figs_roc_{parameter}/{ts_len}")
-
+    for f in glob.glob(f"{region}/figures/{ts_len}/{parameter}*.png"):
+        os.remove(f)
     delete_all_files_in_dir(f"{region}/results/{parameter}/resids")
     delete_all_files_in_dir(f"{region}/results/{parameter}/ews")
 

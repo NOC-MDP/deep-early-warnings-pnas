@@ -345,15 +345,15 @@ def compute_roc(parameter:str,region:str,bool_pred_early=False,five_hundred = Fa
         height=600,
         title=f"ROC, NEMO-MEDUSA Model: {parameter} {pred_window} prediction window",
     )
-    fig_dir = f"{region}/figures/figs_roc_{parameter}/"
+    fig_dir = f"{region}/figures/"
     if five_hundred:
         fig.write_image(
-            fig_dir + "500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            fig_dir + f"500/{parameter}_roc_{pred_window}.png"
         )
     else:
         fig.write_image(
-            fig_dir + "1500/roc_paleo_{}.png".format("early" if bool_pred_early else "late")
+            fig_dir + f"1500/{parameter}_roc_{pred_window}.png"
         )
 
 if __name__ == "__main__":
-    compute_roc(parameter="CHL",region="Labrador_Sea")
+    compute_roc(parameter="DIN",region="Irminger_Sea",five_hundred=False,bool_pred_early=True)
