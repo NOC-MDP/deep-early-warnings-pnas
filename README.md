@@ -1,3 +1,44 @@
+# Results of NEMO MEDUSA model prediction.
+The following is the initial results from the CLASS NEMO MEDUSA model run SSP370. It shows a series of ROC curves for three regions for 5 parameters:
+- Mixed Layer Depth
+- Surface Temperature
+- Dissolved Inorganic Nitrate
+- Chlorophyll
+- Sea surface height
+
+## Labrador Sea
+
+### Early Prediction (60 - 80%)
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/Labrador_Sea/figures/1500_LAB_combined_early.png)
+
+### Late Prediction (80 - 100%)
+
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/Labrador_Sea/figures/1500_LAB_combined_late.png)
+
+## Irminger Sea
+
+### Early Prediction (60 - 80 %)
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/Irminger_Sea/figures/1500_IR_combined_early.png)
+
+### Late Prediction (80 - 100%)
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/Irminger_Sea/figures/1500_IR_combined_late.png)
+
+## West Scotland
+
+### Early Prediction (60 - 80 %)
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/West_Scotland/figures/1500_WS_combined_early.png)
+
+### Late Prediction (80 - 100%)
+
+![image](https://github.com/NOC-MDP/deep-early-warnings-pnas/blob/main/test_empirical/NEMO-MEDUSA/West_Scotland/figures/1500_WS_combined_late.png)
+
+----------------
+
 # Deep learning for early warning signals of tipping points
 This repository contains code to reproduce results in the publication
 
